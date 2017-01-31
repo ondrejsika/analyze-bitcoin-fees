@@ -1,7 +1,7 @@
 import os
 from jsonrpc_requests import Server
 
-server = Server('http://btcrpc:btc@ram5.bo:8332')
+server = Server('http://btcrpc:btc@127.0.0.1:8332')
 
 def get_cb(tx_id):
     print 'bcl decoderawtransaction `bcl getrawtransaction %s`' % tx_id
