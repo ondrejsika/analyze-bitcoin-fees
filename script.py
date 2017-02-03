@@ -1,16 +1,23 @@
 import os
 from jsonrpc_requests import Server
+import json
 
 server = Server('http://btcrpc:btc@127.0.0.1:8332')
 
 def get_cb(tx_id):
     print 'bcl decoderawtransaction `bcl getrawtransaction %s`' % tx_id
     tx = server.decoderawtransaction(server.getrawtransaction(tx_id))
-    try:
-        address = tx['vout'][0]['scriptPubKey']['addresses'][0]
-    except:
-        address = None
-    return tx['vin'][0]['coinbase'], tx['vout'][0]['value'], address
+    addresses = []
+    value = 0
+    for out in tx['vout']:
+        try:
+            address = out['scriptPubKey']['addresses'][0]
+        except:
+            address = None
+        addresses.append(address)
+        value += out['value']
+	
+    return tx['vin'][0]['coinbase'], value, addresses
 
 
 def get_block(block_hash):
@@ -32,7 +39,7 @@ def set_last_hash(block_hash):
 
 def save_block(*data):
     with file('blocks', 'a') as f:
-        f.write(' '.join(map(str, data)))
+        f.write(json.dumps(data))
         f.write('\n')
 
 

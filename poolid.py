@@ -7,15 +7,16 @@ pools = json.load(file('pools.json'))
 
 # print pools['coinbase_tags'].keys()
 
-def find_pool(cb, wallet):
+def find_pool(cb, wallets):
     for cbid, pool in pools['coinbase_tags'].items():
         # print binascii.unhexlify(cb)
         if binascii.hexlify(cbid.encode('utf-8')) in (cb):
             return pool['name']
-    for addr, pool in pools['payout_addresses'].items():
-        # print binascii.unhexlify(cb)
-        if addr == wallet:
-            return pool['name']
+    for wallet in wallets:
+        for addr, pool in pools['payout_addresses'].items():
+            # print binascii.unhexlify(cb)
+            if addr == wallet:
+                return pool['name']
 
 def nbits_to_target(c):
     shift = (c >> 24) & 0xFF
@@ -56,12 +57,12 @@ def bits_to_difficulty(bits, make_float=True):
 
 with file('blocks', 'r') as f:
     for line in f.readlines():
-        line = line.replace('\n', '')
+        line = json.loads(line.replace('\n', ''))
         if not line:
             continue
 
-        block_hash, time, bits, coinbase, value, address = line.split()
-        pool = find_pool(coinbase, address)
+        block_hash, time, bits, coinbase, value, addresses = line
+        pool = find_pool(coinbase, addresses)
         value = float(value)
         time = float(time)
         block_value = 25 if time < 1468082773 else 12.5
