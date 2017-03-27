@@ -1,0 +1,2 @@
+dataset==0.8.0
+jsonrpc-requests==0.3
